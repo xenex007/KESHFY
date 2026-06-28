@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كشف النقاط · التعليم المتوسط</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+
+        :root {
+            --primary: #1e3a5f;
+            --secondary: #2e527a;
+            --accent: #4a7c9b;
+            --light: #f5f8fa;
+            --border: #d1d9e6;
+            --success: #2e7d32;
+            --warning: #ed6c02;
+            --danger: #c62828;
+            --danger-bg: #ffebee;
+            --badge-bg: #e53935;
+        }
+
+        body { background: #e8edf5; padding: 1rem; }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .header-official {
+            text-align: center;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .header-official h1 {
+            color: var(--primary);
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-info {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.8rem;
+        }
+
+        .info-box {
+            background: var(--light);
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+        }
+
+        .info-box label {
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 0.85rem;
+            margin-left: 0.4rem;
+        }
+
+        .info-box input {
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+            text-align: center;
+            min-width: 130px;
+        }
+
+        .info-box input:focus {
+            outline: none;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.6rem 2rem;
+            background: var(--light);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--secondary);
+            transition: all 0.3s ease;
+            opacity: 0.5;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover { opacity: 0.7; transform: translateY(-2px); }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            opacity: 1;
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+        }
+
+        .tab.active .tab-badge {
+            background: #ff6f00;
+            color: white;
+        }
+
+        .tab-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--badge-bg);
+            color: white;
+            border-radius: 50%;
+            padding: 1px 8px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            min-width: 20px;
+            height: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .tab-badge.zero {
+            background: #9e9e9e;
+            opacity: 0.5;
+        }
+
+        .tab-badge.complete {
+            background: #2e7d32;
+            animation: pulse 1.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .tab-content {
+            display: none;
+            animation: slideFade 0.4s ease-in-out;
+        }
+        
+        .tab-content.active { display: block; }
+
+        @keyframes slideFade {
+            0% {
+                opacity: 0;
+                transform: translateX(15px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        thead {
+            background: var(--primary);
+            color: white;
+        }
+
+        th {
+            padding: 0.5rem 0.3rem;
+            font-weight: 700;
+            text-align: center;
+            white-space: nowrap;
+            font-size: 0.8rem;
+        }
+
+        td {
+            padding: 0.4rem 0.3rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:hover { background: var(--light); }
+
+        .subject-name {
+            font-weight: 700;
+            color: var(--primary);
+            text-align: right;
+            padding-right: 0.6rem;
+            min-width: 120px;
+            font-size: 0.85rem;
+        }
+
+        input[type="number"] {
+            width: 55px;
+            padding: 0.3rem;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(74, 124, 155, 0.1);
+        }
+
+        input[type="number"].invalid {
+            border: 2px solid var(--danger) !important;
+            background: var(--danger-bg) !important;
+            color: var(--danger);
+        }
+
+        .coeff-input { width: 45px !important; background: var(--light); }
+
+        .result {
+            font-weight: 700;
+            padding: 0.25rem;
+            border-radius: 5px;
+            background: var(--light);
+            font-size: 0.85rem;
+        }
+
+        .result.provisory {
+            background: #fff3cd;
+            color: var(--warning);
+            border: 1px dashed var(--warning);
+        }
+
+        .result.excellent { color: var(--success); }
+        .result.good { color: #1976d2; }
+        .result.passable { color: var(--warning); }
+        .result.fail { color: var(--danger); }
+
+        .reset-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.2rem;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+
+        .reset-btn:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.8rem;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .summary-item { text-align: center; }
+
+        .summary-item strong {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 0.2rem;
+            opacity: 0.9;
+        }
+
+        .summary-item span {
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .annual-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.8rem;
+            border-radius: 12px;
+            margin-top: 0.8rem;
+            text-align: center;
+            display: none;
+        }
+
+        .annual-box.show { display: block; }
+
+        .annual-box strong {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .annual-box span {
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+        }
+
+        .btn-danger {
+            background: #ffebee;
+            color: var(--danger);
+        }
+
+        .btn-danger:hover { background: #ffcdd2; }
+
+        .add-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin: 1rem 0;
+            padding: 0.8rem;
+            background: var(--light);
+            border-radius: 10px;
+            flex-wrap: wrap;
+        }
+
+        .add-row input {
+            padding: 0.4rem 0.8rem;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(30, 58, 95, 0.3);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            backdrop-filter: blur(4px);
+        }
+
+        .transition-overlay.show { display: flex; }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Indicateur de progression global */
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .progress-dot {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .progress-dot .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        .progress-dot .dot.filled {
+            background: #2e7d32;
+        }
+
+        .progress-dot .dot.partial {
+            background: #ed6c02;
+        }
+
+        @media print {
+            @page { size: A4 portrait; margin: 6mm; }
+
+            body {
+                background: white;
+                padding: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 0.3rem;
+                max-width: 100%;
+                border-radius: 0;
+            }
+
+            .no-print, .add-row, .actions, .tabs, .annual-box, .reset-btn, .progress-indicator {
+                display: none !important;
+            }
+
+            .tab-content {
+                display: none !important;
+            }
+
+            .tab-content.active {
+                display: block !important;
+            }
+
+            .header-official {
+                margin-bottom: 0.5rem;
+                padding-bottom: 0.5rem;
+                border-bottom-width: 1.5px;
+            }
+
+            .header-official h1 { 
+                font-size: 1.3rem;
+                margin-bottom: 0.3rem;
+            }
+
+            .header-info {
+                gap: 1rem;
+                margin-top: 0.5rem;
+            }
+
+            .info-box {
+                padding: 0.3rem 0.8rem;
+                border: 1px solid #999;
+            }
+
+            .info-box label { 
+                font-size: 0.75rem;
+            }
+
+            .info-box input { 
+                min-width: 100px; 
+                font-size: 0.85rem;
+            }
+
+            table {
+                font-size: 0.7rem;
+                page-break-inside: avoid;
+            }
+
+            th {
+                padding: 0.3rem 0.2rem;
+                font-size: 0.7rem;
+                background: var(--primary) !important;
+                -webkit-print-color-adjust: exact;
+            }
+
+            td { 
+                padding: 0.25rem 0.2rem;
+                font-size: 0.7rem;
+            }
+
+            .subject-name {
+                font-size: 0.75rem;
+                padding-right: 0.4rem;
+            }
+
+            input[type="number"] {
+                border: none;
+                background: transparent;
+                width: auto;
+                padding: 0.15rem;
+                font-size: 0.7rem;
+            }
+
+            .result {
+                padding: 0.2rem;
+                font-size: 0.75rem;
+                background: transparent !important;
+            }
+
+            .summary-box {
+                margin-top: 0.6rem;
+                padding: 0.6rem;
+                background: var(--primary) !important;
+                -webkit-print-color-adjust: exact;
+                gap: 2rem;
+            }
+
+            .summary-item strong { 
+                font-size: 0.7rem;
+            }
+
+            .summary-item span { 
+                font-size: 1.2rem;
+            }
+
+            .table-container {
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-info { gap: 0.8rem; }
+            .info-box input { min-width: 100px; }
+            .tabs { flex-direction: column; align-items: stretch; }
+            .tab { width: 100%; justify-content: center; padding: 0.6rem 1rem; }
+            table { font-size: 0.8rem; }
+            input[type="number"] { width: 50px; font-size: 0.8rem; }
+            .subject-name { min-width: 100px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="transition-overlay" id="transitionOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="container" id="bulletin">
+        <div class="header-official">
+            <h1>📘 كشف النقاط</h1>
+            <div class="header-info">
+                <div class="info-box">
+                    <label>اسم التلميذ:</label>
+                    <input type="text" id="studentName" placeholder="الاسم واللقب">
+                </div>
+                <div class="info-box">
+                    <label>السنة الدراسية:</label>
+                    <input type="text" id="academicYear" value="2025-2026">
+                </div>
+                <div class="info-box">
+                    <label>المستوى:</label>
+                    <input type="text" id="classLevel" value="الثانية متوسط">
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs no-print" id="tabsContainer">
+            <button class="tab" data-trimester="1">الفصل الأول</button>
+            <button class="tab" data-trimester="2">الفصل الثاني</button>
+            <button class="tab" data-trimester="3">الفصل الثالث</button>
+        </div>
+
+        <!-- Indicateur de progression global -->
+        <div class="progress-indicator no-print" id="progressIndicator">
+            <span class="progress-dot">
+                <span class="dot" id="dot1"></span>
+                الفصل الأول
+            </span>
+            <span class="progress-dot">
+                <span class="dot" id="dot2"></span>
+                الفصل الثاني
+            </span>
+            <span class="progress-dot">
+                <span class="dot" id="dot3"></span>
+                الفصل الثالث
+            </span>
+        </div>
+
+        <div id="trimestersContent"></div>
+
+        <div class="add-row no-print">
+            <input type="text" id="newSubjectName" placeholder="اسم المادة">
+            <input type="number" id="newSubjectCoeff" placeholder="المعامل" min="0.5" step="0.5" value="1">
+            <button class="btn-primary" onclick="addSubject()">➕ إضافة مادة</button>
+        </div>
+
+        <div class="summary-box" id="summaryBox">
+            <div class="summary-item">
+                <strong>المعدل الفصلي (توقعي)</strong>
+                <span id="trimesterAvg">0.00</span>
+            </div>
+            <div class="summary-item">
+                <strong>مجموع المعاملات</strong>
+                <span id="totalCoeff">0</span>
+            </div>
+        </div>
+
+        <div class="annual-box" id="annualBox">
+            <strong>📊 المعدل السنوي (توقعي)</strong>
+            <span id="annualAvg">0.00</span>
+        </div>
+
+        <div class="actions no-print">
+            <button class="btn-danger" onclick="resetAll()">🗑️ إعادة تعيين الكل</button>
+            <button class="btn-primary" onclick="exportJSON()">💾 حفظ</button>
+            <button class="btn-primary" onclick="document.getElementById('importFile').click()">📂 استيراد</button>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(this)">
+            <button class="btn-primary" onclick="window.print()">🖨️ طباعة</button>
+            <button class="btn-primary" onclick="downloadPDF()">📥 PDF</button>
+        </div>
+    </div>
+
+    <script>
+        const DEFAULT_SUBJECTS = [
+            { id: 'arabic', name: 'اللغة العربية', coeff: 3 },
+            { id: 'french', name: 'اللغة الفرنسية', coeff: 2 },
+            { id: 'english', name: 'اللغة الإنجليزية', coeff: 1 },
+            { id: 'islamic', name: 'التربية الإسلامية', coeff: 1 },
+            { id: 'civic', name: 'التربية المدنية', coeff: 1 },
+            { id: 'histgeo', name: 'التاريخ والجغرافيا', coeff: 2 },
+            { id: 'math', name: 'الرياضيات', coeff: 3 },
+            { id: 'science', name: 'علوم الطبيعة والحياة', coeff: 2 },
+            { id: 'physics', name: 'العلوم الفيزيائية والتكنولوجيا', coeff: 2 },
+            { id: 'eps', name: 'التربية البدنية والرياضية', coeff: 1 }
+        ];
+
+        let data = { 1: [], 2: [], 3: [] };
+        let currentTrimester = 1;
+        let counter = 100;
+        let isTransitioning = false;
+
+        function init() {
+            loadStorage();
+            renderTrimesters();
+            setupTabs();
+            updateAll();
+            updateBadges();
+            updateProgressDots();
+        }
+
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                const trimester = parseInt(tab.dataset.trimester);
+                if (trimester === currentTrimester) {
+                    tab.classList.add('active');
+                }
+                tab.addEventListener('click', function() {
+                    if (isTransitioning) return;
+                    const targetTrimester = parseInt(this.dataset.trimester);
+                    if (targetTrimester === currentTrimester) return;
+                    
+                    switchTrimester(targetTrimester);
+                });
+            });
+        }
+
+        function switchTrimester(targetTrimester) {
+            isTransitioning = true;
+            
+            const overlay = document.getElementById('transitionOverlay');
+            overlay.classList.add('show');
+            
+            setTimeout(() => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelector(`.tab[data-trimester="${targetTrimester}"]`).classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(`trim${targetTrimester}`).classList.add('active');
+                
+                currentTrimester = targetTrimester;
+                
+                updateSummary();
+                updateAnnual();
+                updateBadges();
+                updateProgressDots();
+                
+                setTimeout(() => {
+                    overlay.classList.remove('show');
+                    isTransitioning = false;
+                }, 200);
+            }, 300);
+        }
+
+        function renderTrimesters() {
+            const container = document.getElementById('trimestersContent');
+            container.innerHTML = '';
+
+            for (let t = 1; t <= 3; t++) {
+                const div = document.createElement('div');
+                div.className = `tab-content ${t === currentTrimester ? 'active' : ''}`;
+                div.id = `trim${t}`;
+                div.innerHTML = `
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:30px;"></th>
+                                    <th>المادة</th>
+                                    <th>المعامل</th>
+                                    <th>تقويم</th>
+                                    <th>الفرض 1</th>
+                                    <th>الفرض 2</th>
+                                    <th>معدل التقويم</th>
+                                    <th>الإختبار/40</th>
+                                    <th>المجموع</th>
+                                    <th>المعدل</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody${t}"></tbody>
+                        </table>
+                    </div>
+                `;
+                container.appendChild(div);
+
+                if (data[t].length === 0) {
+                    data[t] = JSON.parse(JSON.stringify(DEFAULT_SUBJECTS));
+                }
+
+                renderRows(t);
+            }
+        }
+
+        function renderRows(trimester) {
+            const tbody = document.getElementById(`tbody${trimester}`);
+            tbody.innerHTML = '';
+
+            data[trimester].forEach((subject, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <button class="reset-btn no-print" onclick="resetRow(${trimester},${idx})" title="إعادة تعيين هذه المادة">🗑️</button>
+                    </td>
+                    <td class="subject-name">${subject.name}</td>
+                    <td><input type="number" class="coeff-input" value="${subject.coeff}" min="0.5" step="0.5" onchange="calc(${trimester},${idx})"></td>
+                    <td><input type="number" class="grade-20" min="0" max="20" step="0.01" onchange="validateAndCalc(${trimester},${idx}, this, 20)"></td>
+                    <td><input type="number" class="grade-20" min="0" max="20" step="0.01" onchange="validateAndCalc(${trimester},${idx}, this, 20)"></td>
+                    <td><input type="number" class="grade-20" min="0" max="20" step="0.01" onchange="validateAndCalc(${trimester},${idx}, this, 20)"></td>
+                    <td class="result eval-avg">0.00</td>
+                    <td><input type="number" class="grade-40" min="0" max="40" step="0.01" onchange="validateAndCalc(${trimester},${idx}, this, 40)"></td>
+                    <td class="result total">0.00</td>
+                    <td class="result avg">0.00</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function resetRow(trimester, idx) {
+            const tbody = document.getElementById(`tbody${trimester}`);
+            const row = tbody.children[idx];
+            if (!row) return;
+
+            const inputs = row.querySelectorAll('input:not(.coeff-input)');
+            inputs.forEach(inp => {
+                inp.value = '';
+                inp.classList.remove('invalid');
+            });
+
+            calc(trimester, idx);
+            updateBadges();
+            updateProgressDots();
+        }
+
+        function validateAndCalc(trimester, idx, input, max) {
+            const val = input.value.trim();
+            
+            if (val === '') {
+                input.classList.remove('invalid');
+                calc(trimester, idx);
+                return;
+            }
+
+            const num = parseFloat(val);
+            
+            if (isNaN(num) || num < 0 || num > max) {
+                input.classList.add('invalid');
+                input.value = '';
+                calc(trimester, idx);
+                return;
+            }
+
+            input.classList.remove('invalid');
+            calc(trimester, idx);
+            updateBadges();
+            updateProgressDots();
+        }
+
+        function calc(trimester, idx) {
+            const tbody = document.getElementById(`tbody${trimester}`);
+            const row = tbody.children[idx];
+            if (!row) return;
+
+            const grade20s = row.querySelectorAll('input.grade-20');
+            const grade40 = row.querySelector('input.grade-40');
+            const coeffInput = row.querySelector('.coeff-input');
+            const evalAvgCell = row.querySelector('.eval-avg');
+            const totalCell = row.querySelector('.total');
+            const avgCell = row.querySelector('.avg');
+
+            const coeff = parseFloat(coeffInput.value) || 1;
+
+            if (data[trimester] && data[trimester][idx]) {
+                data[trimester][idx].coeff = coeff;
+            }
+
+            const notes20 = [];
+            let hasValid20 = false;
+            grade20s.forEach(inp => {
+                if (inp.value !== '' && !inp.classList.contains('invalid')) {
+                    notes20.push(parseFloat(inp.value));
+                    hasValid20 = true;
+                }
+            });
+
+            let exam = null;
+            let hasExam = false;
+            if (grade40.value !== '' && !grade40.classList.contains('invalid')) {
+                exam = parseFloat(grade40.value);
+                hasExam = true;
+            }
+
+            const avgEval = notes20.length > 0
+                ? notes20.reduce((a, b) => a + b, 0) / notes20.length
+                : 0;
+            evalAvgCell.textContent = avgEval.toFixed(2);
+
+            if (!hasValid20 && !hasExam) {
+                totalCell.textContent = '0.00';
+                totalCell.className = 'result total';
+                avgCell.textContent = '0.00';
+                avgCell.className = 'result avg';
+                save();
+                updateSummary();
+                updateAnnual();
+                updateBadges();
+                updateProgressDots();
+                return;
+            }
+
+            let finalAvg;
+            let weightedTotal;
+            let isProvisory;
+
+            if (!hasExam) {
+                finalAvg = avgEval;
+                weightedTotal = finalAvg * coeff;
+                isProvisory = true;
+            } else {
+                const rawTotal = avgEval + exam;
+                finalAvg = rawTotal / 3;
+                weightedTotal = finalAvg * coeff;
+                isProvisory = false;
+            }
+
+            totalCell.textContent = weightedTotal.toFixed(2);
+            totalCell.className = 'result total' + (isProvisory ? ' provisory' : '');
+
+            avgCell.textContent = finalAvg.toFixed(2);
+            avgCell.className = 'result avg' + (isProvisory ? ' provisory' : '');
+
+            if (!isProvisory) {
+                if (finalAvg >= 16) avgCell.classList.add('excellent');
+                else if (finalAvg >= 12) avgCell.classList.add('good');
+                else if (finalAvg >= 10) avgCell.classList.add('passable');
+                else avgCell.classList.add('fail');
+            }
+
+            save();
+            updateSummary();
+            updateAnnual();
+            updateBadges();
+            updateProgressDots();
+        }
+
+        function updateSummary() {
+            let sumWeighted = 0;
+            let sumCoeff = 0;
+            const tbody = document.getElementById(`tbody${currentTrimester}`);
+
+            for (let i = 0; i < data[currentTrimester].length; i++) {
+                const row = tbody.children[i];
+                if (!row) continue;
+
+                const totalCell = row.querySelector('.total');
+                const weightedTotal = parseFloat(totalCell.textContent) || 0;
+                const c = parseFloat(row.querySelector('.coeff-input').value) || 1;
+
+                const gradeInputs = row.querySelectorAll('input:not(.coeff-input)');
+                const hasAnyNote = Array.from(gradeInputs).some(inp => inp.value !== '' && !inp.classList.contains('invalid'));
+
+                if (hasAnyNote) {
+                    sumWeighted += weightedTotal;
+                    sumCoeff += c;
+                }
+            }
+
+            const general = sumCoeff > 0 ? sumWeighted / sumCoeff : 0;
+            document.getElementById('trimesterAvg').textContent = general.toFixed(2);
+            document.getElementById('totalCoeff').textContent = sumCoeff;
+        }
+
+        function updateAnnual() {
+            let sumAvgs = 0;
+            let count = 0;
+
+            for (let t = 1; t <= 3; t++) {
+                const tbody = document.getElementById(`tbody${t}`);
+                if (!tbody) continue;
+
+                let sumWeighted = 0;
+                let sumCoeff = 0;
+
+                for (let i = 0; i < data[t].length; i++) {
+                    const row = tbody.children[i];
+                    if (!row) continue;
+
+                    const totalCell = row.querySelector('.total');
+                    const weightedTotal = parseFloat(totalCell.textContent) || 0;
+                    const c = parseFloat(row.querySelector('.coeff-input').value) || 1;
+
+                    const gradeInputs = row.querySelectorAll('input:not(.coeff-input)');
+                    const hasAnyNote = Array.from(gradeInputs).some(inp => inp.value !== '' && !inp.classList.contains('invalid'));
+
+                    if (hasAnyNote) {
+                        sumWeighted += weightedTotal;
+                        sumCoeff += c;
+                    }
+                }
+
+                if (sumCoeff > 0) {
+                    sumAvgs += sumWeighted / sumCoeff;
+                    count++;
+                }
+            }
+
+            const annual = count > 0 ? sumAvgs / count : 0;
+            document.getElementById('annualAvg').textContent = annual.toFixed(2);
+            document.getElementById('annualBox').classList.toggle('show', count > 0);
+        }
+
+        function updateAll() {
+            for (let t = 1; t <= 3; t++) {
+                for (let i = 0; i < data[t].length; i++) {
+                    calc(t, i);
+                }
+            }
+            updateBadges();
+            updateProgressDots();
+        }
+
+        function updateBadges() {
+            document.querySelectorAll('.tab-badge').forEach(b => b.remove());
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                const trimester = parseInt(tab.dataset.trimester);
+                const tbody = document.getElementById(`tbody${trimester}`);
+                if (!tbody) return;
+                
+                let count = 0;
+                let total = 0;
+                const rows = tbody.children;
+                for (let i = 0; i < rows.length; i++) {
+                    total++;
+                    const gradeInputs = rows[i].querySelectorAll('input:not(.coeff-input)');
+                    const hasAnyNote = Array.from(gradeInputs).some(inp => inp.value !== '' && !inp.classList.contains('invalid'));
+                    if (hasAnyNote) count++;
+                }
+                
+                if (count > 0) {
+                    const badge = document.createElement('span');
+                    badge.className = 'tab-badge';
+                    if (count === total) {
+                        badge.classList.add('complete');
+                    } else if (count === 0) {
+                        badge.classList.add('zero');
+                    }
+                    badge.textContent = count;
+                    tab.appendChild(badge);
+                }
+            });
+        }
+
+        function updateProgressDots() {
+            for (let t = 1; t <= 3; t++) {
+                const tbody = document.getElementById(`tbody${t}`);
+                if (!tbody) continue;
+                
+                let count = 0;
+                let total = 0;
+                const rows = tbody.children;
+                for (let i = 0; i < rows.length; i++) {
+                    total++;
+                    const gradeInputs = rows[i].querySelectorAll('input:not(.coeff-input)');
+                    const hasAnyNote = Array.from(gradeInputs).some(inp => inp.value !== '' && !inp.classList.contains('invalid'));
+                    if (hasAnyNote) count++;
+                }
+                
+                const dot = document.getElementById(`dot${t}`);
+                if (dot) {
+                    dot.className = 'dot';
+                    if (count === 0) {
+                        // vide
+                    } else if (count === total) {
+                        dot.classList.add('filled');
+                    } else {
+                        dot.classList.add('partial');
+                    }
+                }
+            }
+        }
+
+        function addSubject() {
+            const name = document.getElementById('newSubjectName').value.trim();
+            const coeff = parseFloat(document.getElementById('newSubjectCoeff').value) || 1;
+
+            if (!name) return alert('أدخل اسم المادة');
+
+            const subject = { id: 'custom_' + counter++, name, coeff };
+
+            for (let t = 1; t <= 3; t++) {
+                data[t].push(subject);
+                renderRows(t);
+            }
+
+            document.getElementById('newSubjectName').value = '';
+            save();
+            updateBadges();
+            updateProgressDots();
+        }
+
+        function resetAll() {
+            if (!confirm('تأكيد إعادة تعيين جميع المواد؟')) return;
+            
+            for (let t = 1; t <= 3; t++) {
+                const tbody = document.getElementById(`tbody${t}`);
+                if (!tbody) continue;
+                
+                const rows = tbody.children;
+                for (let i = 0; i < rows.length; i++) {
+                    const inputs = rows[i].querySelectorAll('input:not(.coeff-input)');
+                    inputs.forEach(inp => {
+                        inp.value = '';
+                        inp.classList.remove('invalid');
+                    });
+                }
+            }
+            
+            updateAll();
+        }
+
+        function exportJSON() {
+            const blob = new Blob([JSON.stringify({
+                student: document.getElementById('studentName').value,
+                year: document.getElementById('academicYear').value,
+                level: document.getElementById('classLevel').value,
+                data: data
+            }, null, 2)], { type: 'application/json' });
+            
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `Bulletin_${document.getElementById('studentName').value || 'eleve'}.json`;
+            a.click();
+        }
+
+        function importJSON(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    document.getElementById('studentName').value = json.student || '';
+                    document.getElementById('academicYear').value = json.year || '2025-2026';
+                    document.getElementById('classLevel').value = json.level || 'الثانية متوسط';
+                    
+                    if (json.data) {
+                        data = json.data;
+                        renderTrimesters();
+                        updateAll();
+                    }
+                    
+                    save();
+                    updateBadges();
+                    updateProgressDots();
+                } catch (err) {
+                    alert('خطأ في قراءة الملف');
+                }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        function downloadPDF() {
+            const studentName = document.getElementById('studentName').value || 'eleve';
+            const trimName = document.querySelector('.tab.active').textContent.trim();
+            
+            const tempContainer = document.createElement('div');
+            tempContainer.style.background = 'white';
+            tempContainer.style.padding = '15px';
+            tempContainer.style.fontFamily = 'Cairo, sans-serif';
+            tempContainer.style.direction = 'rtl';
+            
+            tempContainer.innerHTML = `
+                <div style="text-align:center; border-bottom:2px solid #1e3a5f; padding-bottom:10px; margin-bottom:12px;">
+                    <h1 style="color:#1e3a5f; font-size:1.5rem; margin-bottom:8px;">📘 كشف النقاط</h1>
+                    <div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-top:10px;">
+                        <div style="background:#f5f8fa; padding:5px 12px; border-radius:6px; border:1px solid #d1d9e6;">
+                            <strong style="color:#2e527a; font-size:0.8rem;">اسم التلميذ:</strong>
+                            <span style="font-weight:600; margin-right:6px; font-size:0.9rem;">${document.getElementById('studentName').value || '__________'}</span>
+                        </div>
+                        <div style="background:#f5f8fa; padding:5px 12px; border-radius:6px; border:1px solid #d1d9e6;">
+                            <strong style="color:#2e527a; font-size:0.8rem;">السنة الدراسية:</strong>
+                            <span style="font-weight:600; margin-right:6px; font-size:0.9rem;">${document.getElementById('academicYear').value}</span>
+                        </div>
+                        <div style="background:#f5f8fa; padding:5px 12px; border-radius:6px; border:1px solid #d1d9e6;">
+                            <strong style="color:#2e527a; font-size:0.8rem;">المستوى:</strong>
+                            <span style="font-weight:600; margin-right:6px; font-size:0.9rem;">${document.getElementById('classLevel').value}</span>
+                        </div>
+                        <div style="background:#f5f8fa; padding:5px 12px; border-radius:6px; border:1px solid #d1d9e6;">
+                            <strong style="color:#2e527a; font-size:0.8rem;">الفصل:</strong>
+                            <span style="font-weight:600; margin-right:6px; font-size:0.9rem;">${trimName}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const activeContent = document.getElementById(`trim${currentTrimester}`);
+            const tableClone = activeContent.querySelector('.table-container').cloneNode(true);
+            
+            tableClone.querySelectorAll('input').forEach(inp => {
+                const span = document.createElement('span');
+                span.textContent = inp.value || '';
+                span.style.fontWeight = '600';
+                span.style.color = '#1e3a5f';
+                if (inp.classList.contains('invalid')) {
+                    span.style.color = '#c62828';
+                    span.textContent = 'خطأ';
+                }
+                inp.replaceWith(span);
+            });
+
+            tableClone.querySelectorAll('.reset-btn').forEach(btn => btn.remove());
+            
+            tempContainer.appendChild(tableClone);
+            
+            const summaryClone = document.getElementById('summaryBox').cloneNode(true);
+            summaryClone.querySelectorAll('.no-print').forEach(el => el.remove());
+            tempContainer.appendChild(summaryClone);
+            
+            const opt = {
+                margin: [5, 5, 5, 5],
+                filename: `Bulletin_${studentName}_${trimName}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(tempContainer).save();
+        }
+
+        function save() {
+            localStorage.setItem('bulletin_cem', JSON.stringify({
+                student: document.getElementById('studentName').value,
+                year: document.getElementById('academicYear').value,
+                level: document.getElementById('classLevel').value,
+                data: data
+            }));
+        }
+
+        function loadStorage() {
+            const saved = localStorage.getItem('bulletin_cem');
+            if (saved) {
+                try {
+                    const json = JSON.parse(saved);
+                    document.getElementById('studentName').value = json.student || '';
+                    document.getElementById('academicYear').value = json.year || '2025-2026';
+                    document.getElementById('classLevel').value = json.level || 'الثانية متوسط';
+                    if (json.data) data = json.data;
+                } catch (e) {}
+            }
+        }
+
+        ['studentName', 'academicYear', 'classLevel'].forEach(id => {
+            document.getElementById(id).addEventListener('input', save);
+        });
+
+        window.onload = init;
+    </script>
+</body>
+</html>
